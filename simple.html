@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Chatアプリ</title>
+<link rel="stylesheet" href="css/line.css">
+</head>
+<body>
+
+<!-- コンテンツ表示画面 -->
+
+<div class="kaiwa line" id="kaiwa_line1">
+    <div class="name">
+        おなまえ
+    </div>
+    <div class="fukidasi left">
+        <img class="icon" src="imgs/buke.png" alt="">LINE風です。
+    </div>
+    <div class="fukidasi left">
+        続けて喋るとフキダシのしっぽはつきません。
+    </div>
+    <div class="fukidasi right">
+        HTMLとCSSでできます。
+    </div>
+    <br><!-- 次のフキダシにしっぽをつけたいときはbrを挿入 -->
+    <div class="fukidasi right">
+        続けても、しっぽをつけたいときは間にbrを入れます。
+    </div>
+    <div class="fukidasi left">
+        <img class="icon" src="img/icon.png" alt="">グループじゃないとき。
+    </div>
+</div>
+
+<div class="textarea_container">
+    <textarea name="" id="text" cols="50"></textarea>
+    <button id="send">送信</button>
+    <button id="delete">削除</button>
+</div>
+<div id="output"></div>
+
+<!--/ コンテンツ表示画面 -->
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- JQuery -->
+
+
+<!--** 以下Firebase **-->
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    import { getDatabase, ref, push, set, onChildAdded, remove, onChildRemoved, query, orderByChild, equalTo, onValue, limitToLast }
+        from "https://cdnjs.cloudflare.com/ajax/libs/firebase/9.8.1/firebase-database.min.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbYOIhDa3siImDkPfJas4GbeSFCBQyx8I",
+      authDomain: "fir-demo-72e19.firebaseapp.com",
+      projectId: "fir-demo-72e19",
+      storageBucket: "fir-demo-72e19.appspot.com",
+      messagingSenderId: "807751381276",
+      appId: "1:807751381276:web:bf967096490fb6524f0ad9"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'chat');
+    
+    $('#send').on('click', function(){
+        const msg = {
+            //uname : $('#uname').val(),
+            text : $('#text').val()
+        }
+        const newPostRef = push(dbRef);
+        set(newPostRef, msg);
+        //alert("click");
+    });
+
+    //DB追加の際に表示アップデート
+    onChildAdded(dbRef, function (data) {
+        const msg = data.val();
+        const key = data.key;
+        // let h = "<p>";
+        // h += msg.uname;
+        // h += "<br>";
+        // h += msg.text;
+        // h += "</p>";
+        // $("#output").append(h); // #output の最後に追加
+        let h = "<div class='fukidasi right'>";
+        h += msg.text;
+        h += "</div>";       
+        $("#kaiwa_line1").append(h);
+    });
+
+    $('#delete').on('click', function(){
+        //親要素取得
+        let parent = document.getElementById('kaiwa_line1');
+        //console.log(parent);
+        //子要素取得
+        let children = document.getElementsByClassName('fukidasi right');
+        //console.log(children);
+
+        let len = children.length;
+        //console.log(len);
+        
+        //吹き出し表現の削除
+        let last_text = children[len-1].textContent;
+        if (len > 0){
+            parent.removeChild(children[len-1]);
+        }
+        
+        //Key IDの取得
+        //console.log(last_text);
+        let keyID = query(dbRef, orderByChild("text"), equalTo(last_text), limitToLast(1));
+        //console.log(keyID);
+        //let KeyID = query(dbRef, limitToLast(1));
+        //console.log(keyID);
+        let realkeyID;
+        onValue(keyID, (snapshot) => realkeyID = snapshot.val());
+   
+        console.log("realkeyID:"+realkeyID.key);
+        console.log("keyID:"+keyID.key);
+        dbRef.child(realkeyID).remove();
+    });
+
+  </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
