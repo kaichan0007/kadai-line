@@ -11,30 +11,17 @@
 
 <div class="kaiwa line" id="kaiwa_line1">
     <div class="name">
-        おなまえ
+        エコーボット君
     </div>
     <div class="fukidasi left">
-        <img class="icon" src="imgs/buke.png" alt="">LINE風です。
-    </div>
-    <div class="fukidasi left">
-        続けて喋るとフキダシのしっぽはつきません。
-    </div>
-    <div class="fukidasi right">
-        HTMLとCSSでできます。
-    </div>
-    <br><!-- 次のフキダシにしっぽをつけたいときはbrを挿入 -->
-    <div class="fukidasi right">
-        続けても、しっぽをつけたいときは間にbrを入れます。
-    </div>
-    <div class="fukidasi left">
-        <img class="icon" src="img/icon.png" alt="">グループじゃないとき。
+        <img class="icon" src="imgs/buke.png" alt="">こんにちは。エコーします。
     </div>
 </div>
 
 <div class="textarea_container">
     <textarea name="" id="text" cols="50"></textarea>
     <button id="send">送信</button>
-    <button id="delete">削除</button>
+    <button id="delete">クリア</button>
 </div>
 <div id="output"></div>
 
@@ -96,6 +83,12 @@
         h += msg.text;
         h += "</div>";       
         $("#kaiwa_line1").append(h);
+
+        //エコーボット
+        let hr = "<div class='fukidasi left'>";
+        hr += msg.text;
+        hr += "</div>";       
+        $("#kaiwa_line1").append(hr);        
     });
 
     $('#delete').on('click', function(){
@@ -110,23 +103,28 @@
         //console.log(len);
         
         //吹き出し表現の削除
-        let last_text = children[len-1].textContent;
+        //let last_text = children[len-1].textContent;
         if (len > 0){
-            parent.removeChild(children[len-1]);
+            while(len > 0){
+                parent.removeChild(children[len-1]);
+                len--;
+            }
         }
         
         //Key IDの取得
         //console.log(last_text);
-        let keyID = query(dbRef, orderByChild("text"), equalTo(last_text), limitToLast(1));
+        //let keyID = query(dbRef, orderByChild("text"), equalTo(last_text), limitToLast(1));
         //console.log(keyID);
         //let KeyID = query(dbRef, limitToLast(1));
         //console.log(keyID);
-        let realkeyID;
-        onValue(keyID, (snapshot) => realkeyID = snapshot.val());
+        //let realkeyID;
+        //onValue(keyID, (snapshot) => realkeyID = snapshot);
    
-        console.log("realkeyID:"+realkeyID.key);
-        console.log("keyID:"+keyID.key);
-        dbRef.child(realkeyID).remove();
+        //console.log("realkeyID:"+realkeyID.key+realkeyID.val().text);
+        //console.log("keyID:"+keyID.key);
+       
+        //console.log(dbRef);
+        remove(dbRef);
     });
 
   </script>
